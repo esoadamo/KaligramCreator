@@ -1,6 +1,6 @@
 const PAPER_RATIO = [1.4, 1];
 const PAPER_WIDTH = 1684; // pixels
-const PAPER_DATA = {
+let PAPER_DATA = {
   'size': [],
   'fontColor': '#000000',
   'fontSize': 30,
@@ -17,9 +17,9 @@ const COLORS = {
 let CTX = null; // CTX of the paintingArea canvas
 let TXT_AREA = null; // the txt area with printed text
 
-const LINES_REDO = [];  // list of lines deleted with undo button
+const LINES_REDO = []; // list of lines deleted with undo button
 
-let lineNumberFontSize = 10;
+let LAST_SAVE = null; // URL of last exported save
 
 function repaint() {
   let text = TXT_AREA.value.replace('\n', ' '); // painted text
@@ -94,6 +94,23 @@ function repaint() {
   }
 }
 
+/* Functional, but deactivated
+function save() {
+  let data = new Blob([JSON.stringify(PAPER_DATA)], {
+    type: 'text/plain'
+  });
+
+  if (LAST_SAVE !== null) {
+    window.URL.revokeObjectURL(LAST_SAVE);
+  }
+  LAST_SAVE = window.URL.createObjectURL(data);
+
+  let link = document.createElement('a');
+  link.download = "kaligram.kl";
+  link.href = LAST_SAVE;
+  link.click();
+};*/
+
 window.onload = () => {
   // Init global DOM variables
   TXT_AREA = document.querySelector('#paintedText');
@@ -151,9 +168,36 @@ window.onload = () => {
     }
   });
 
+  // Load & save button
+  btnSave = document.querySelector('#btnSave');
+  btnSave.addEventListener('click', () => {
+    let copyarea = document.createElement('textarea');
+    document.body.appendChild(copyarea);
+    copyarea.value = JSON.stringify(PAPER_DATA);
+    copyarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(copyarea);
+    alert('Copied to clipboard');
+  });
+  btnLoad = document.querySelector('#btnLoad');
+  btnLoad.addEventListener('click', () => {
+    let txtSave = prompt("Enter the content of saved file");
+    PAPER_DATA = JSON.parse(txtSave);
+    let fontColor = document.querySelector('#textColor');
+    let fontSize = document.querySelector('#fontSize');
+    let font = document.querySelector('#font').value;
+    fontColor.value = PAPER_DATA['fontColor'];
+    fontSize.value = PAPER_DATA['fontSize'];
+    font.value = PAPER_DATA['font'];
+    TXT_AREA.value = PAPER_DATA['text'];
+    if ((mouseData != null) && (PAPER_DATA['lines'].length > 0))
+      mouseData = PAPER_DATA['lines'][PAPER_DATA['lines'].length - 1]['end'];
+    repaint();
+  });
+
   // Undo / redo button
   btnUndo = document.querySelector('#btnUndo');
-  btnUndo.addEventListener('click', ()=>{
+  btnUndo.addEventListener('click', () => {
     if (PAPER_DATA['lines'].length == 0)
       return;
     LINES_REDO.push(PAPER_DATA['lines'].pop());
@@ -162,7 +206,7 @@ window.onload = () => {
     repaint();
   });
   btnRedo = document.querySelector('#btnRedo');
-  btnRedo.addEventListener('click', ()=> {
+  btnRedo.addEventListener('click', () => {
     if (LINES_REDO.length == 0)
       return;
     PAPER_DATA['lines'].push(LINES_REDO.pop());
