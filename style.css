@@ -1,3 +1,9 @@
 #paintingArea{
   border: 2px solid black;
 }
+ #paintedText {
+   width: 100%;
+ }
+  body {
+    display: flex;
+  }

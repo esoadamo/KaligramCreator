@@ -8,9 +8,16 @@ const COLORS = {
   'lineEnd': "#ff4040"
 }
 let CTX = null; // CTX of the paintingArea canvas
+let TXT_AREA = null; // the txt area with printed text
+
 let lineNumberFontSize = 10;
 
+const FONT_SIZE = 30; // TODO make more scalable
+const FONT = "sans-serif"; // TODO make more adjustable
+
 function repaint(){
+  let text = TXT_AREA.textContent.replace('\n', ' ');  // painted text
+
   // Paint on white paper
   CTX.fillStyle = COLORS['paper'];
   CTX.fillRect(0, 0, ...PAPER_DATA['size']);
@@ -30,10 +37,35 @@ function repaint(){
     CTX.fillText(i.toString(), ...line['start']);
     CTX.fillStyle = COLORS['lineEnd'];
     CTX.fillText(i.toString(), ...line['end']);
+
+    if (text.length > 0) {
+      let textOnThisLine = "";
+      let lineWidth = Math.sqrt(Math.pow(Math.abs(line['start'][0] - line['end'][0]), 2), Math.pow(Math.abs(line['start'][1] - line['end'][1]), 2));
+      CTX.font = `${FONT_SIZE}px ${FONT}`;
+      while ((CTX.measureText(textOnThisLine).width < lineWidth) && (text.length > 0)){
+        textOnThisLine += text.substring(0, 1);
+        text = text.substring(1);
+      }
+
+      // We have overflown the length of the line by last character. Don't be mean and return this little fella to the rest of the text.
+      if (CTX.measureText(textOnThisLine).width > lineWidth){
+        text = textOnThisLine.substring(textOnThisLine.length - 1) + text;
+        textOnThisLine = textOnThisLine.substring(0, textOnThisLine.length - 1);
+        console.log(text);
+      }
+
+      let lineAngle = Math.atan((line['end'][1] - line['start'][1]) / (line['end'][0] - line['start'][0]));
+      CTX.save();
+      CTX.translate(...line['start']);
+      CTX.rotate(lineAngle);
+      CTX.fillText(textOnThisLine, 0, 0);
+      CTX.restore();
+    }
   }
 }
 
 window.onload = () => {
+  TXT_AREA = document.querySelector('#paintedText');
   let paintingArea = document.querySelector('#paintingArea');
   let paintingAreaWidth = window.innerWidth * 0.8;
   let paintRatio = PAPER_RATIO[0] * PAPER_RATIO[1];
@@ -48,20 +80,19 @@ window.onload = () => {
 
   let screenRation = paintingArea.width / paintingAreaWidth;
 
-  let mouseMode = "awaitingFirstClick";
+  let mouseMode = "prePaint";
   let mouseData = null;
   paintingArea.addEventListener('click', (e) => {
     let rect = paintingArea.getBoundingClientRect();
     let clickPos = [(e.x - rect.left) * screenRation, (e.y - rect.top) * screenRation];
     switch(mouseMode){
-      case "awaitingFirstClick":
+      case "prePaint":
         mouseData = clickPos;
-        mouseMode = "awaitingSecondClick";
+        mouseMode = "painting";
         break;
-      case "awaitingSecondClick":
+      case "painting":
         PAPER_DATA['lines'].push({'start': mouseData, 'end': clickPos});
-        mouseData = null;
-        mouseMode = "awaitingFirstClick";
+        mouseData = clickPos;
         repaint();
         break;
     }
