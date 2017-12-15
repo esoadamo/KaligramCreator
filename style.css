@@ -1,9 +1,15 @@
-#paintingArea{
+#paintingArea {
   border: 2px solid black;
 }
- #paintedText {
-   width: 100%;
- }
-  body {
-    display: flex;
-  }
+
+#paintedText {
+  width: 100%;
+}
+
+form {
+  border: 2px solid #3bdef2;
+}
+
+body {
+  display: flex;
+}
