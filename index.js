@@ -3,6 +3,8 @@ const PAPER_WIDTH = 1684; // pixels
 const PAPER_DATA = {
   'size': [],
   'fontColor': '#000000',
+  'fontSize': 30,
+  'font': 'sans-serif',
   'lines': []
 }; // dictionary with saved data
 const COLORS = {
@@ -16,16 +18,17 @@ let TXT_AREA = null; // the txt area with printed text
 
 let lineNumberFontSize = 10;
 
-const FONT_SIZE = 30; // TODO make more scalable
-const FONT = "sans-serif"; // TODO make more adjustable
-
 function repaint() {
   let text = TXT_AREA.value.replace('\n', ' '); // painted text
   let drawLines = document.querySelector('#drawLines').checked;
   let drawLineNumbers = document.querySelector('#drawLineNumbers').checked;
   let drawText = document.querySelector('#drawText').checked;
   let fontColor = document.querySelector('#textColor').value;
+  let fontSize = document.querySelector('#fontSize').value;
+  let font = document.querySelector('#font').value;
   PAPER_DATA['fontColor'] = fontColor;
+  PAPER_DATA['fontSize'] = fontSize;
+  PAPER_DATA['font'] = font;
 
   // Paint on white paper
   CTX.fillStyle = COLORS['paper'];
@@ -56,7 +59,7 @@ function repaint() {
       let textOnThisLine = "";
       let lineWidth = Math.sqrt(Math.pow(Math.abs(line['start'][0] - line['end'][0]), 2) + Math.pow(Math.abs(line['start'][1] - line['end'][1]), 2));
       CTX.fillStyle = fontColor;
-      CTX.font = `${FONT_SIZE}px ${FONT}`;
+      CTX.font = `${fontSize}px ${font}`;
       while ((CTX.measureText(textOnThisLine).width < lineWidth) && (text.length > 0)) {
         textOnThisLine += text.substring(0, 1);
         text = text.substring(1);
@@ -141,9 +144,9 @@ window.onload = () => {
   });
 
   // Add listeners to settings
-  [document.querySelector('#drawLines'), document.querySelector('#drawLineNumbers'), document.querySelector('#drawText'), document.querySelector('#textColor')]
+  [document.querySelector('#drawLines'), document.querySelector('#drawLineNumbers'), document.querySelector('#drawText'), document.querySelector('#textColor'), document.querySelector('#fontSize')]
   .forEach((e) => {
     e.addEventListener('change', repaint);
   });
-  TXT_AREA.addEventListener('input', repaint);
+  [document.querySelector('#font'), TXT_AREA].forEach((e) => {e.addEventListener('input', repaint)});
 }
