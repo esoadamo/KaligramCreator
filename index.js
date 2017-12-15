@@ -71,15 +71,13 @@ function repaint() {
       let lineAngle = Math.atan((line['end'][1] - line['start'][1]) / (line['end'][0] - line['start'][0]));
       let textX = 0;
       // If we are moving backwards with the text, reverse it ad start writing from the end - this is the only way to have the text readable
-      if (line['start'][0] > line['end'][0]){
+      if (line['start'][0] > line['end'][0]) {
         textOnThisLine = textOnThisLine.split('').reverse().join('');
         textX = -CTX.measureText(textOnThisLine).width;
       }
       CTX.save();
       CTX.translate(...line['start']);
       CTX.rotate(lineAngle);
-      if (i ==  PAPER_DATA['lines'].length - 1)
-      console.log(lineAngle* (180/Math.PI));
       CTX.fillText(textOnThisLine, textX, 0);
       CTX.restore();
     }
@@ -114,6 +112,7 @@ window.onload = () => {
       case "prePaint":
         mouseData = clickPos;
         mouseMode = "painting";
+        paintingArea.style.cursor = "var(--cursor-end)";
         break;
       case "painting":
         PAPER_DATA['lines'].push({
@@ -122,6 +121,21 @@ window.onload = () => {
         });
         mouseData = clickPos;
         repaint();
+        break;
+    }
+  });
+  // Stop painting upon press of the ESCape
+  document.body.addEventListener('keyup', (e) => {
+    const key = e.keyCode ? e.keyCode : e.which;
+
+    switch (key) {
+      case 27: // ESC
+        // End painting
+        if (mouseMode != "prePaint") {
+          mouseMode = "prePaint";
+          mouseData = null;
+          paintingArea.style.cursor = "var(--cursor-start)";
+        }
         break;
     }
   });

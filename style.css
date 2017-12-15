@@ -1,5 +1,11 @@
+:root {
+  --cursor-start: url('cross_start.png'), auto;
+  --cursor-end: url('cross_end.png'), auto;
+}
+
 #paintingArea {
   border: 2px solid black;
+  cursor: var(--cursor-start);
 }
 
 #paintedText {
