@@ -5,6 +5,7 @@ const PAPER_DATA = {
   'fontColor': '#000000',
   'fontSize': 30,
   'font': 'sans-serif',
+  'text': '',
   'lines': []
 }; // dictionary with saved data
 const COLORS = {
@@ -15,6 +16,8 @@ const COLORS = {
 }
 let CTX = null; // CTX of the paintingArea canvas
 let TXT_AREA = null; // the txt area with printed text
+
+const LINES_REDO = [];  // list of lines deleted with undo button
 
 let lineNumberFontSize = 10;
 
@@ -29,6 +32,7 @@ function repaint() {
   PAPER_DATA['fontColor'] = fontColor;
   PAPER_DATA['fontSize'] = fontSize;
   PAPER_DATA['font'] = font;
+  PAPER_DATA['text'] = text;
 
   // Paint on white paper
   CTX.fillStyle = COLORS['paper'];
@@ -126,6 +130,7 @@ window.onload = () => {
           'end': clickPos
         });
         mouseData = clickPos;
+        LINES_REDO.length = 0;
         repaint();
         break;
     }
@@ -144,6 +149,26 @@ window.onload = () => {
         }
         break;
     }
+  });
+
+  // Undo / redo button
+  btnUndo = document.querySelector('#btnUndo');
+  btnUndo.addEventListener('click', ()=>{
+    if (PAPER_DATA['lines'].length == 0)
+      return;
+    LINES_REDO.push(PAPER_DATA['lines'].pop());
+    if (mouseData != null)
+      mouseData = PAPER_DATA['lines'][PAPER_DATA['lines'].length - 1]['end'];
+    repaint();
+  });
+  btnRedo = document.querySelector('#btnRedo');
+  btnRedo.addEventListener('click', ()=> {
+    if (LINES_REDO.length == 0)
+      return;
+    PAPER_DATA['lines'].push(LINES_REDO.pop());
+    if (mouseData != null)
+      mouseData = PAPER_DATA['lines'][PAPER_DATA['lines'].length - 1]['end'];
+    repaint();
   });
 
   // Add listeners to settings

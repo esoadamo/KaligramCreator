@@ -10,14 +10,17 @@
 </head>
 
 <body>
-  <form>
-   <input type="checkbox" checked id="drawLines">Lines<br>
-   <input type="checkbox" checked id="drawLineNumbers">Numbers<br>
-   <input type="checkbox" checked id="drawText">Text<br>
-   <input type="color" id="textColor">Text color<br>
-   <input type="number" style="width: 5em;" id="fontSize" value="30">Font size<br>
-   <input type="text" style="width: 5em;" id="font" value="sans-serif">Font<br>
-  </form>
+  <div>
+    <form>
+      <input type="checkbox" checked id="drawLines">Lines<br>
+      <input type="checkbox" checked id="drawLineNumbers">Numbers<br>
+      <input type="checkbox" checked id="drawText">Text<br>
+      <input type="color" id="textColor">Text color<br>
+      <input type="number" style="width: 5em;" id="fontSize" value="30">Font size<br>
+      <input type="text" style="width: 5em;" id="font" value="sans-serif">Font<br>
+    </form>
+    <button id="btnUndo">Undo</button><button id="btnRedo">Redo</button>
+  </div>
   <canvas id="paintingArea"></canvas>
   <textarea id="paintedText" placeholder="What should I write?">
 Error dolorem corporis eaque enim sequi molestiae. Fuga quas dolore eum delectus eum. Consequatur sed vitae totam similique officia. Id ut ratione rerum quia. Aliquid minima et nihil et non.
