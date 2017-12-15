@@ -54,7 +54,7 @@ function repaint() {
 
     if (drawText && (text.length > 0)) {
       let textOnThisLine = "";
-      let lineWidth = Math.sqrt(Math.pow(Math.abs(line['start'][0] - line['end'][0]), 2), Math.pow(Math.abs(line['start'][1] - line['end'][1]), 2));
+      let lineWidth = Math.sqrt(Math.pow(Math.abs(line['start'][0] - line['end'][0]), 2) + Math.pow(Math.abs(line['start'][1] - line['end'][1]), 2));
       CTX.fillStyle = fontColor;
       CTX.font = `${FONT_SIZE}px ${FONT}`;
       while ((CTX.measureText(textOnThisLine).width < lineWidth) && (text.length > 0)) {
@@ -69,10 +69,18 @@ function repaint() {
       }
 
       let lineAngle = Math.atan((line['end'][1] - line['start'][1]) / (line['end'][0] - line['start'][0]));
+      let textX = 0;
+      // If we are moving backwards with the text, reverse it ad start writing from the end - this is the only way to have the text readable
+      if (line['start'][0] > line['end'][0]){
+        textOnThisLine = textOnThisLine.split('').reverse().join('');
+        textX = -CTX.measureText(textOnThisLine).width;
+      }
       CTX.save();
       CTX.translate(...line['start']);
       CTX.rotate(lineAngle);
-      CTX.fillText(textOnThisLine, 0, 0);
+      if (i ==  PAPER_DATA['lines'].length - 1)
+      console.log(lineAngle* (180/Math.PI));
+      CTX.fillText(textOnThisLine, textX, 0);
       CTX.restore();
     }
   }
