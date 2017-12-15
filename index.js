@@ -49,8 +49,11 @@ function repaint() {
 
     if (drawLineNumbers) {
       CTX.font = "30px sans-serif"
-      CTX.fillStyle = COLORS['lineStart'];
-      CTX.fillText(i.toString(), ...line['start']);
+      // Draw start only on a real start of the line (not on the start of a turn)
+      if ((i == 0) || (PAPER_DATA['lines'][i - 1]['end'] != line['start'])) {
+        CTX.fillStyle = COLORS['lineStart'];
+        CTX.fillText(i.toString(), ...line['start']);
+      }
       CTX.fillStyle = COLORS['lineEnd'];
       CTX.fillText(i.toString(), ...line['end']);
     }
@@ -148,5 +151,7 @@ window.onload = () => {
   .forEach((e) => {
     e.addEventListener('change', repaint);
   });
-  [document.querySelector('#font'), TXT_AREA].forEach((e) => {e.addEventListener('input', repaint)});
+  [document.querySelector('#font'), TXT_AREA].forEach((e) => {
+    e.addEventListener('input', repaint)
+  });
 }
