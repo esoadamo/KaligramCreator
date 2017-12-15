@@ -111,30 +111,46 @@ function save() {
   link.click();
 };*/
 
-window.onload = () => {
-  // Init global DOM variables
-  TXT_AREA = document.querySelector('#paintedText');
-
-  // Set paintingArea size
-  let paintingArea = document.querySelector('#paintingArea');
+function resize(paintingArea) {
   let paintingAreaWidth = window.innerWidth * 0.8;
   let paintRatio = PAPER_RATIO[0] * PAPER_RATIO[1];
+  let paintingAreaHeight = paintingAreaWidth / paintRatio;
+  if (paintingAreaHeight > window.innerHeight * 0.98) {
+    paintingAreaHeight = window.innerHeight * 0.98;
+    paintingAreaWidth = paintingAreaHeight * paintRatio;
+  }
   paintingArea.style.width = paintingAreaWidth + 'px';
-  paintingArea.style.height = (paintingAreaWidth / paintRatio) + 'px';
+  paintingArea.style.height = paintingAreaHeight + 'px';
   paintingArea.width = PAPER_WIDTH;
   paintingArea.height = Math.round(PAPER_WIDTH / paintRatio);
   CTX = paintingArea.getContext('2d');
 
+  PAPER_DATA['size'].length = 0;
   PAPER_DATA['size'].push(paintingArea.width);
   PAPER_DATA['size'].push(paintingArea.height);
 
-  let screenRation = paintingArea.width / paintingAreaWidth;
+  let screenRatio = paintingArea.width / paintingAreaWidth;
+  repaint();
+  return screenRatio;
+}
+
+window.onload = () => {
+  // Init global DOM variables
+  TXT_AREA = document.querySelector('#paintedText');
+
+
+  // Set paintingArea size
+  let paintingArea = document.querySelector('#paintingArea');
+
+  let screenRatio = resize(paintingArea);
+
+  window.onresize = ()=>{screenRatio = resize(paintingArea)};
 
   let mouseMode = "prePaint";
   let mouseData = null;
   paintingArea.addEventListener('click', (e) => {
     let rect = paintingArea.getBoundingClientRect();
-    let clickPos = [(e.x - rect.left) * screenRation, (e.y - rect.top) * screenRation];
+    let clickPos = [(e.x - rect.left) * screenRatio, (e.y - rect.top) * screenRatio];
     switch (mouseMode) {
       case "prePaint":
         mouseData = clickPos;
