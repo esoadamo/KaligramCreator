@@ -80,10 +80,9 @@ function repaint() {
 
       let lineAngle = Math.atan((line['end'][1] - line['start'][1]) / (line['end'][0] - line['start'][0]));
       let textX = 0;
-      // If we are moving backwards with the text, reverse it ad start writing from the end - this is the only way to have the text readable
+      // Rotate the text by 180 degrees so it is not mirrored
       if (line['start'][0] > line['end'][0]) {
-        textOnThisLine = textOnThisLine.split('').reverse().join('');
-        textX = -CTX.measureText(textOnThisLine).width;
+        lineAngle += Math.PI;
       }
       CTX.save();
       CTX.translate(...line['start']);
